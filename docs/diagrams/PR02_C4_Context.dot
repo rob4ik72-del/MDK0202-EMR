@@ -1,0 +1,17 @@
+digraph C4 {
+graph [newrank=true,rankdir=TB,bgcolor=white,pad=.25,nodesep=.5,ranksep=.65,fontsize=20,fontname="DejaVu Sans",splines=polyline];
+node [shape=box,style="rounded,filled",fillcolor="#f5f7fa",color="#35516b",fontname="DejaVu Sans",fontsize=13,margin=".15,.12"];
+edge [fontname="DejaVu Sans",fontsize=10,color="#36495a",arrowsize=.8];
+graph [label="C4 Level 1 — контекст АИС ЭМК",labelloc=t];
+med [label="Медработник\n[Person]\nПросмотр назначенной карты"];
+admin [label="Администратор\n[Person]\nНастройка без чтения клинических данных"];
+emr [label="Электронная медицинская карта\n[Software System]\nИмпорт, права доступа, аудит",fillcolor="#d9e7f3"];
+registry [label="Реестр пациентов\n[External Software System]\nКарточки пациентов"];
+idp [label="Поставщик идентификации\n[External Software System]\nПодтверждение личности"];
+med -> emr [label="Запрашивает карту\nHTTPS / JSON"];
+admin -> emr [label="Управляет настройками"];
+emr -> registry [label="Импортирует сведения\nJSON"];
+emr -> idp [label="Проверяет токен\nOIDC"];
+{rank=same;med;admin;}{rank=same;registry;idp;}
+legend [shape=note,fillcolor=white,fontsize=10,label="Легенда: Person — человек; Software System — система.\nExternal Software System — внешняя система. Стрелка: инициатор → получатель.\nHTTPS / OIDC — целевая архитектура. Учебный стенд использует\nHTTP только loopback, JSON-файл и временные opaque-токены."];
+registry -> legend [style=invis];idp -> legend [style=invis];}

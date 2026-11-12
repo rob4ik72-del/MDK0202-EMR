@@ -1,0 +1,23 @@
+digraph C4 {
+graph [newrank=true,rankdir=TB,bgcolor=white,pad=.25,nodesep=.5,ranksep=.65,fontsize=20,fontname="DejaVu Sans",splines=polyline];
+node [shape=box,style="rounded,filled",fillcolor="#f5f7fa",color="#35516b",fontname="DejaVu Sans",fontsize=13,margin=".15,.12"];
+edge [fontname="DejaVu Sans",fontsize=10,color="#36495a",arrowsize=.8];
+graph [label="C4 Level 2 — контейнеры АИС ЭМК",labelloc=t];
+med [label="Медработник\n[Person]\nЗапрашивает назначенную карту"];
+subgraph cluster_emr {label="Граница системы ЭМК";labelloc=b;labeljust=l;fontsize=14;color="#35516b";style=rounded;margin=25;
+ui [label="Клиент ЭМК\n[Container: C# / WPF]\nВвод запроса и показ ответа"];
+api [label="Интеграционный шлюз\n[Container: C# / ASP.NET Core 8]\nВалидация, права и чтение",fillcolor="#d9e7f3"];
+db [shape=cylinder,label="Хранилище пациентов\n[Container: SQLite]\nКарточки и версии"];
+audit [shape=cylinder,label="Шифрованный журнал\n[Container: JSONL / AES-256-GCM]\nСобытия доступа и отказа"];
+ui -> api [label="Запрос карточки\nHTTPS / JSON / Bearer"];
+api -> db [label="Чтение и запись\nSQL с параметрами"];
+api -> audit [label="Запись события\nAES-GCM / JSONL"];
+{rank=same;db;audit;}}
+registry [label="Реестр пациентов\n[External Software System]\nПоставляет карточки"];
+idp [label="Поставщик идентификации\n[External Software System]\nПодтверждает личность"];
+med -> ui [label="Команда загрузки\nлокальный интерфейс"];
+api -> registry [label="Импорт через адаптер\nJSON; проектный канал"];
+api -> idp [label="Проверка токена\nOIDC; проектный контур"];
+{rank=same;registry;idp;}
+legend [shape=note,fillcolor=white,fontsize=10,label="Легенда: Container — приложение или хранилище; рамка — граница ЭМК.\nExternal Software System — внешняя система. Стрелка: инициатор → получатель.\nHTTPS и OIDC — целевая архитектура; учебный стенд использует\nHTTP только loopback, JSON-файл реестра и временные opaque-токены.\nIdP — поставщик идентификации; JSONL — JSON по одной записи в строке."];
+registry -> legend [style=invis];idp -> legend [style=invis];}
